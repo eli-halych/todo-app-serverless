@@ -29,13 +29,25 @@ functions:
           method: get
           path: todos
 
-  # TODO: Configure this function
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
-    events:
-      - http:
+      events:
+        - http:
           method: post
-          path: todos
+            path: todos
+            cors: true
+            authorizer: Auth
+#            reqValidatorName: RequestBodyValidator
+            documentation:
+              summary: Create a new todo item
+              description: Create a todo item
+#              requestModels:
+#                'application/json': TodoRequest
+      iamRoleStatements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   # TODO: Configure this function
   UpdateTodo:
@@ -63,7 +75,6 @@ functions:
 
 resources:
   Resources:
-    # TODO: Add any necessary AWS resources
     TodosDynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:

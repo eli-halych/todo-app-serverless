@@ -4,6 +4,20 @@ service:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
+  - serverless-offline
+  - serverless-dynamodb-local
+
+custom:
+  serverless-offline:
+    port: 3003
+
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+    stages:
+      - ${self:provider.stage}
 
 provider:
   name: aws
@@ -13,7 +27,7 @@ provider:
   region: ${opt:region, 'us-east-1'}
 
   environment:
-    TODO_TABLE: Todos-${self:provider.stage}
+    TODOS_TABLE: Todos-${self:provider.stage}
     TODO_ID_INDEX: TodoIdIndex
 
 functions:
@@ -37,23 +51,23 @@ functions:
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
-      events:
-        - http:
+    events:
+      - http:
           method: post
-            path: todos
-            cors: true
-            authorizer: Auth
-#            reqValidatorName: RequestBodyValidator TODO
-            documentation:
-              summary: Create a new todo item
-              description: Create a todo item
-#              requestModels: TODO
-#                'application/json': TodoRequest
-      iamRoleStatements:
-        - Effect: Allow
-          Action:
-            - dynamodb:PutItem
-          Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+          path: todos
+          cors: true
+          authorizer: Auth
+#           reqValidatorName: RequestBodyValidator TODO
+          documentation:
+            summary: Create a new todo item
+            description: Create a todo item
+#             requestModels: TODO
+#               'application/json': TodoRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler

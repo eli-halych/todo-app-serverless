@@ -13,7 +13,7 @@ export class TodosAccess {
   }
 
   async getAllTodoItems(userId: String): Promise<TodoItem[]> {
-    console.log('Getting all Todos')
+    console.log('Getting all Todos');
     const result = await this.docClient.query({
       TableName: this.todosTable,
       KeyConditionExpression: 'userId = :userId',

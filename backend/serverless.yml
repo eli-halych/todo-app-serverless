@@ -27,6 +27,8 @@ functions:
       - http:
           method: get
           path: todos
+          cors: true
+          authorizer: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -57,6 +59,8 @@ functions:
     handler: src/lambda/http/updateTodo.handler
     events:
       - http:
+          cors: true
+          authorizer: Auth
           method: patch
           path: todos/{todoId}
     iamRoleStatements:
@@ -65,13 +69,14 @@ functions:
           - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
-  # TODO: Configure this function
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
     events:
       - http:
           method: delete
           path: todos/{todoId}
+          cors: true
+          authorizer: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:

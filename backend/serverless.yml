@@ -4,6 +4,9 @@ service:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
+  - serverless-plugin-canary-deployments
   - serverless-offline
   - serverless-dynamodb-local
 
@@ -26,7 +29,7 @@ custom:
         title: Todo API
         description: Serverless application for managing todos
     models:
-      - name: TodoRequest
+      - name: TodoRequestModel
         contentType: application/json
         schema: ${file(src/models/create-todo-request.json)}
 
@@ -68,16 +71,16 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
-#           reqValidatorName: RequestBodyValidator TODO
+          reqValidatorName: RequestBodyValidator
           documentation:
             summary: Create a new todo item
             description: Create a todo item
-#             requestModels: TODO
-#               'application/json': TodoRequest
+            requestModels:
+              'application/json': TodoRequestModel
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamodb:PutItem
+          - dynamodb: PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   UpdateTodo:
@@ -91,7 +94,7 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamodb:UpdateItem
+          - dynamodb: UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   DeleteTodo:
@@ -105,7 +108,7 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamodb:DeleteItem
+          - dynamodb: DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   # TODO: Configure this function
@@ -115,6 +118,23 @@ functions:
       - http:
           method: post
           path: todos/{todoId}/attachment
+          cors: true
+          authorizer: Auth
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODO_ID_INDEX}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.TODOS_S3_BUCKET}/*
 
 resources:
   Resources:
@@ -122,11 +142,11 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-          - AttributeName: userId   # partitionKey
+          - AttributeName: userId   # partitionKey, todos tied to a user
             AttributeType: S
-          - AttributeName: createdAt  # sortKey
+          - AttributeName: createdAt  # sortKey, can be sorted by date
             AttributeType: S
-          - AttributeName: todoId   # indexKey
+          - AttributeName: todoId   # indexKey, that is the todos id
             AttributeType: S
         KeySchema:
           - AttributeName: userId
@@ -138,9 +158,9 @@ resources:
         GlobalSecondaryIndexes:
           - IndexName: ${self:provider.environment.TODO_ID_INDEX}
             KeySchema:
-              - AttributeName: todoId # partitionKey
+              - AttributeName: todoId
                 KeyType: HASH
-              - AttributeName: createdAt # indexKey
+              - AttributeName: createdAt
                 KeyType: RANGE
             Projection:
-              ProjectionType: ALL # What attributes will be copied to an index
+              ProjectionType: ALL # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-dynamodb-projectionobject.html

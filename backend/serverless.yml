@@ -28,7 +28,7 @@ custom:
     models:
       - name: TodoRequest
         contentType: application/json
-        schema: ${file(models/create-todo-request.json)}
+        schema: ${file(src/models/create-todo-request.json)}
 
 provider:
   name: aws

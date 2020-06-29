@@ -7,7 +7,7 @@ import {getUserId} from "../utils";
 import {createTodo} from "../../business-logic/todos";
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  // console.log('Processing event', event);
+  console.log('Processing event', event);
 
   const parsedBody: CreateTodoRequest = JSON.parse(event.body);
 

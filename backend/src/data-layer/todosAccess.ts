@@ -1,5 +1,4 @@
 import * as AWS  from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 
 import { TodoItem } from '../models/TodoItem'
@@ -74,9 +73,8 @@ function createDynamoDBClient() {
     return new AWS.DynamoDB.DocumentClient({
       region: 'localhost',
       endpoint: 'http://localhost:8000',
-      service: AWSXRay.captureAWSClient(new AWS.DynamoDB)
     })
   }
 
-  return new AWS.DynamoDB.DocumentClient({service: AWSXRay.captureAWSClient(new AWS.DynamoDB)})
+  return new AWS.DynamoDB.DocumentClient()
 }

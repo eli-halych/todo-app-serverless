@@ -5,10 +5,10 @@ import {deleteTodo} from "../../business-logic/todos";
 import {getUserId} from "../utils";
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const todoId = event.pathParameters.todoId
+  const todoId = event.pathParameters.todoId;
 
-  const userId = getUserId(event)
-  await deleteTodo(todoId, userId)
+  const userId = getUserId(event);
+  await deleteTodo(todoId, userId);
 
   return {
     statusCode: 200,

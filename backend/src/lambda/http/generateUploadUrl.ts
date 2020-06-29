@@ -20,7 +20,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const url = s3.getSignedUrl('putObject', {
     Bucket: bucketName,
     Key: todoId,
-    Expires: urlExpiration  // The expiration must be a number, received string
+    Expires: urlExpiration
   })
 
   const result = await docClient.query({

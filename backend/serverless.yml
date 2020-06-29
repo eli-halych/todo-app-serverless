@@ -9,7 +9,7 @@ plugins:
 
 custom:
   serverless-offline:
-    port: 3003
+    httpPort: 5000
 
   dynamodb:
     start:

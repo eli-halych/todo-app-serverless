@@ -67,6 +67,7 @@ export class TodosAccess {
 
 }
 
+// for local DynamoDB instance
 function createDynamoDBClient() {
   if (process.env.IS_OFFLINE) {
     console.log('Creating a local DynamoDB instance')

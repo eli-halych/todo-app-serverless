@@ -30,7 +30,6 @@ functions:
           path: todos
 
   # TODO: Configure this function
-  CreateTodos:
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:

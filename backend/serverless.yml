@@ -19,6 +19,17 @@ custom:
     stages:
       - ${self:provider.stage}
 
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: Todo API
+        description: Serverless application for managing todos
+    models:
+      - name: TodoRequest
+        contentType: application/json
+        schema: ${file(models/create-todo-request.json)}
+
 provider:
   name: aws
   runtime: nodejs8.10

@@ -35,7 +35,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
@@ -82,7 +82,7 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamodb: PutItem
+          - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   UpdateTodo:
@@ -96,7 +96,7 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamodb: UpdateItem
+          - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   DeleteTodo:
@@ -110,9 +110,8 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamodb: DeleteItem
+          - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:

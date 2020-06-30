@@ -3,16 +3,20 @@ import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 
 import { TodoItem } from '../models/TodoItem'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
+import {createLogger} from "../utils/logger";
+
+const logger = createLogger('access-layer')
 
 export class TodosAccess {
 
   constructor(
     private readonly docClient: DocumentClient = createDynamoDBClient(),
     private readonly todosTable = process.env.TODOS_TABLE) {
+    logger.info('Constructor invoked');
   }
 
   async getAllTodoItems(userId: String): Promise<TodoItem[]> {
-    console.log('Getting all Todos');
+    logger.info('Getting all Todos');
     const result = await this.docClient.query({
       TableName: this.todosTable,
       KeyConditionExpression: 'userId = :userId',
@@ -27,6 +31,7 @@ export class TodosAccess {
   }
 
   async createTodoItem(todo: TodoItem): Promise<TodoItem> {
+    logger.info("Creating a Todo item...");
     await this.docClient.put({
       TableName: this.todosTable,
       Item: todo
@@ -36,6 +41,7 @@ export class TodosAccess {
   }
 
   async updateTodoItem(todoId: String, userId: String, updatedTodo: UpdateTodoRequest) {
+    logger.info("Updating a Todo item...");
     await this.docClient.update({
       TableName: this.todosTable,
       Key: {
@@ -55,6 +61,7 @@ export class TodosAccess {
   }
 
   async deleteTodoItem(todoId: String, userId: String) {
+    logger.info("Deleting a Todo item...");
     await this.docClient.delete({
       TableName: this.todosTable,
       Key: {
@@ -68,6 +75,7 @@ export class TodosAccess {
 
 // for local DynamoDB instance
 function createDynamoDBClient() {
+  logger.info("Creating Todos DynamoDB Client...");
   if (process.env.IS_OFFLINE) {
     console.log('Creating a local DynamoDB instance')
     return new AWS.DynamoDB.DocumentClient({
